@@ -1,0 +1,4 @@
+&6-----------------------------------------------------
+&r{user} &r&ehas invited you to join their party!
+&r&6Click here &r&eto join! You have 60 seconds to accept.&r&6
+&r&6-----------------------------------------------------

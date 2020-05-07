@@ -1,0 +1,4 @@
+&b-----------------------------------------------------
+&r{user} &r&ahas requested to join the Guild!
+&r&a/guild accept {ign}&a to accept their request!
+&r&b-----------------------------------------------------
