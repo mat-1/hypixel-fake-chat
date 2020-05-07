@@ -15,6 +15,7 @@ def get_mode_unformatted(mode):
 		unformatted_text = f.read().strip()
 		mode_cache[mode] = unformatted_text
 	return unformatted_text
+
 async def do_render(mode, ign, data=None):
 	username_data = await username.get_username_data(ign)
 	rank_formatted = username_data['rank_formatted']
@@ -36,40 +37,6 @@ async def do_render(mode, ign, data=None):
 		image.save(output, format='png')
 		contents = output.getvalue()
 	return contents
-
-
-def format_chat_message(author, content):
-	# chat message
-	text_formatted = author + '&f: ' + content
-	return text_formatted
-
-def format_dm_message(author, content):
-	# chat message
-	text_formatted = f'&dFrom &r{author}&r&7: &r&7{content}&r'
-	return text_formatted
-
-def format_friend_request(user):
-	text_formatted = (
-		'&9&m----------------------------------------------------&r&9\n'
-		f'&r&eFriend request from &r{user}&r&9\n'
-		'&r&a&l[ACCEPT]&r&8 - &r&c&l[DENY]&r&8 - &r&7&l[IGNORE]&r&9\n'
-		'&r&9&m----------------------------------------------------&r'
-	)
-	return text_formatted
-
-def format_party_request(user):
-	text_formatted = (
-		'&6-----------------------------------------------------\n'
-		f'&r{user} &r&ehas invited you to join their party!\n'
-		'&r&6Click here &r&eto join! You have 60 seconds to accept.&r&6\n'
-		'&r&6-----------------------------------------------------&r'
-	)
-	return text_formatted
-
-def format_party_message(user, content):
-	text_formatted = f'&r&9Party > {user}&f: &r{content}&r'
-	return text_formatted
-
 
 
 routes = web.RouteTableDef()
