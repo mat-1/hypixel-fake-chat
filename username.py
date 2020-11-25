@@ -2,15 +2,16 @@ import aiohttp
 
 cached_datas = {}
 
+s = aiohttp.ClientSession()
+
 async def get_username_data(username):
 	if username.lower() in cached_datas:
 		return cached_datas[username.lower()]
-	async with aiohttp.ClientSession() as s:
-		r = await s.get(f'https://api.slothpixel.me/api/players/{username}')
-		try:
-			data = await r.json()
-		except:
-			data = {}
+	r = await s.get(f'https://api.slothpixel.me/api/players/{username}')
+	try:
+		data = await r.json()
+	except:
+		data = {}
 	if 'username' not in data:
 		data = {
 			'username': username,

@@ -16,7 +16,7 @@ def get_mode_unformatted(mode):
 		mode_cache[mode] = unformatted_text
 	return unformatted_text
 
-async def do_render(mode, ign, data=None):
+async def do_render(mode, ign, data=None, transparent=False):
 	username_data = await username.get_username_data(ign)
 	rank_formatted = username_data['rank_formatted']
 	ign = username_data['username']
@@ -31,8 +31,15 @@ async def do_render(mode, ign, data=None):
 		.replace('{ign}', ign)\
 		.replace('{data}', data)
 	print(formatted_text)
-	foreground = await loop.run_in_executor(None, pillowtext.create_image_from_formatted_text, formatted_text)
-	image = await loop.run_in_executor(None, pillowtext.add_background, foreground)
+	foreground = await loop.run_in_executor(
+		None,
+		pillowtext.create_image_from_formatted_text,
+		formatted_text,
+	)
+	if not transparent:
+		image = await loop.run_in_executor(None, pillowtext.add_background, foreground)
+	else:
+		image = foreground
 	with io.BytesIO() as output:
 		image.save(output, format='png')
 		contents = output.getvalue()
@@ -50,9 +57,12 @@ async def index(request):
 async def render_image(request):
 	ign = request.query.get('u', '???')
 	mode = request.query.get('m', 'chat')
-	content = request.query.get('d', '???')
+	content = request.query.get('d', '???')\
+		.replace('\\n', '\n')\
+		.replace('\\\\', '\\')
+	transparent = request.query.get('t', '0').lower() in {'1', 'true'}
 	print(ign, mode, content)
-	output_bytes = await do_render(mode, ign, content)
+	output_bytes = await do_render(mode, ign, content, transparent=transparent)
 	return web.Response(
 		body=output_bytes,
 		content_type='image/png'
