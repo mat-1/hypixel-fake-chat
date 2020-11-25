@@ -25,9 +25,67 @@ color_codes = {
 	'd': (254, 85, 254),
 	'e': (255, 255, 85),
 	'f': (255, 255, 255)
-}	
+}
 
-def create_image_from_formatted_text(formatted_text):
+def add_newlines(formatted_text, get_text_width_func):
+	new_text = ''
+
+	is_bold = False
+	current_x = 0
+	next_character_is_formatter = False
+
+	for character in formatted_text:
+		if character == '&':
+			next_character_is_formatter = True
+		elif next_character_is_formatter:
+			if character == 'l':
+				is_bold = True
+			elif character == 'r':
+				is_bold = False
+			next_character_is_formatter = False
+		elif character == '\n':
+			current_x = 0
+		else:
+			character_width = get_text_width_func(character)
+			if is_bold:
+				character_width += 2
+			current_x += character_width
+		if current_x > 1000:
+			new_text += '\n'
+			current_x = 0
+
+
+		new_text += character
+
+	return new_text
+
+def get_formatted_width(formatted_text, get_text_width_func):
+	width = 0
+	is_bold = False
+	current_x = 0
+	next_character_is_formatter = False
+
+	for character in formatted_text:
+		if character == '&':
+			next_character_is_formatter = True
+		elif next_character_is_formatter:
+			if character == 'l':
+				is_bold = True
+			elif character == 'r':
+				is_bold = False
+			next_character_is_formatter = False
+		elif character == '\n':
+			current_x = 0
+		else:
+			character_width = get_text_width_func(character)
+			if is_bold:
+				character_width += 2
+			current_x += character_width
+			if current_x > width:
+				width = current_x
+	return width
+
+def create_image_from_formatted_text(formatted_text, transparent=False):
 	im = Image.new(
 		'RGBA',
 		(1, 1),
@@ -39,9 +97,12 @@ def create_image_from_formatted_text(formatted_text):
 	def get_text_width(string):
 		return draw.textsize(string, font)[0]
 
+	formatted_text = add_newlines(formatted_text, get_text_width)
+
 	unformatted_text = re.sub(r'&.', '', formatted_text)
 
 	width, height = draw.textsize(unformatted_text, font)
+	width = get_formatted_width(formatted_text, get_text_width)
 	im = im.resize((width + (text_size // 8) + 2, height + (text_size // 8)))
 
 	draw = ImageDraw.Draw(im)
@@ -115,6 +176,7 @@ def create_image_from_formatted_text(formatted_text):
 			if is_bold:
 				character_width += 2
 			current_x += character_width
+			
 	return im
 
 def add_background(foreground, filename=None):
