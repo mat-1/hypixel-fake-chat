@@ -20,7 +20,6 @@ async def do_render(mode, ign, data=None, transparent=False):
 	username_data = await username.get_username_data(ign)
 	rank_formatted = username_data['rank_formatted']
 	ign = username_data['username']
-	print(rank_formatted, repr(rank_formatted))
 	if rank_formatted != '&7':
 		username_with_rank_formatted = rank_formatted + ' ' + ign
 	else:
@@ -30,7 +29,6 @@ async def do_render(mode, ign, data=None, transparent=False):
 		.replace('{user}', username_with_rank_formatted)\
 		.replace('{ign}', ign)\
 		.replace('{data}', data)
-	print(formatted_text)
 	foreground = await loop.run_in_executor(
 		None,
 		pillowtext.create_image_from_formatted_text,
@@ -61,7 +59,6 @@ async def render_image(request):
 		.replace('\\n', '\n')\
 		.replace('\\\\', '\\')
 	transparent = request.query.get('t', '0').lower() in {'1', 'true'}
-	print(ign, mode, content)
 	output_bytes = await do_render(mode, ign, content, transparent=transparent)
 	return web.Response(
 		body=output_bytes,
